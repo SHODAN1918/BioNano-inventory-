@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratory Chemical Inventory</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>Laboratory Chemical Inventory</h1>
+                <div class="header-actions">
+                    <button id="add-chemical-btn" class="btn btn--primary">
+                        <span class="btn-icon">+</span>
+                        Add New Chemical
+                    </button>
+                </div>
+                <div class="header-stats">
+                    <div class="stat">
+                        <span class="stat-label">Total Chemicals:</span>
+                        <span class="stat-value" id="total-count">147</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">In Stock:</span>
+                        <span class="stat-value" id="in-stock-count">133</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Showing:</span>
+                        <span class="stat-value" id="showing-count">147</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Data Persistence Warning -->
+        <div class="persistence-warning">
+            <div class="warning-content">
+                <span class="warning-icon">⚠️</span>
+                <span>Changes are stored in memory only. Export your data to save permanently.</span>
+                <button id="export-json-btn" class="btn btn--sm btn--outline">Export JSON</button>
+            </div>
+        </div>
+
+        <div class="main-layout">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-content">
+                    <!-- Search -->
+                    <div class="filter-section">
+                        <label for="search-input" class="form-label">Search Chemicals</label>
+                        <input 
+                            type="text" 
+                            id="search-input" 
+                            class="form-control" 
+                            placeholder="Search by chemical name..."
+                            autocomplete="off"
+                        >
+                    </div>
+
+                    <!-- Shelf Location Filter -->
+                    <div class="filter-section">
+                        <label for="shelf-filter" class="form-label">Shelf Location</label>
+                        <select id="shelf-filter" class="form-control">
+                            <option value="all">All Shelves</option>
+                            <option value="Amino acids">Amino acids</option>
+                            <option value="Gel and Colors">Gel and Colors</option>
+                            <option value="1">Shelf 1</option>
+                            <option value="2">Shelf 2</option>
+                            <option value="3">Shelf 3</option>
+                            <option value="4">Shelf 4</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <!-- Reagent Type Filter -->
+                    <div class="filter-section">
+                        <label for="type-filter" class="form-label">Reagent Type</label>
+                        <select id="type-filter" class="form-control">
+                            <option value="all">All Types</option>
+                            <option value="Biological buffer">Biological Buffer</option>
+                            <option value="Chromatography resin">Chromatography Resin</option>
+                            <option value="Gel electrophoresis/culture medium">Gel/Culture Medium</option>
+                            <option value="Variable">Variable/Other</option>
+                        </select>
+                    </div>
+
+                    <!-- Stock Status Filter -->
+                    <div class="filter-section">
+                        <label for="stock-filter" class="form-label">Stock Status</label>
+                        <select id="stock-filter" class="form-control">
+                            <option value="all">All</option>
+                            <option value="in-stock">In Stock (✅)</option>
+                            <option value="out-of-stock">Out of Stock</option>
+                        </select>
+                    </div>
+
+                    <!-- Sort Options -->
+                    <div class="filter-section">
+                        <label for="sort-select" class="form-label">Sort By</label>
+                        <select id="sort-select" class="form-control">
+                            <option value="name">Name (A-Z)</option>
+                            <option value="shelf">Shelf Location</option>
+                            <option value="molecular-weight">Molecular Weight</option>
+                            <option value="hazard">Hazard Level</option>
+                        </select>
+                    </div>
+
+                    <!-- Clear Filters -->
+                    <button id="clear-filters" class="btn btn--outline btn--full-width">
+                        Clear All Filters
+                    </button>
+
+                    <!-- Export Button -->
+                    <button id="export-btn" class="btn btn--secondary btn--full-width">
+                        Export Visible Results
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <div class="chemicals-container" id="chemicals-container">
+                    <!-- Chemical cards will be populated by JavaScript -->
+                </div>
+                
+                <div class="no-results" id="no-results" style="display: none;">
+                    <div class="no-results-content">
+                        <h3>No chemicals found</h3>
+                        <p>Try adjusting your search criteria or filters.</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Add/Edit Chemical Modal -->
+    <div class="modal hidden" id="chemical-modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Add New Chemical</h2>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="chemical-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="chemical-name" class="form-label">Chemical Name *</label>
+                            <input type="text" id="chemical-name" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="shelf-location" class="form-label">Shelf Location</label>
+                            <select id="shelf-location" class="form-control">
+                                <option value="Amino acids">Amino acids</option>
+                                <option value="Gel and Colors">Gel and Colors</option>
+                                <option value="1">Shelf 1</option>
+                                <option value="2">Shelf 2</option>
+                                <option value="3">Shelf 3</option>
+                                <option value="4">Shelf 4</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="molecular-weight" class="form-label">Molecular Weight</label>
+                            <input type="text" id="molecular-weight" class="form-control" placeholder="e.g., 121.14">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cas-number" class="form-label">CAS Number</label>
+                            <input type="text" id="cas-number" class="form-control" placeholder="e.g., 77-86-1">
+                        </div>
+                        <div class="form-group">
+                            <label for="primary-use" class="form-label">Primary Use</label>
+                            <select id="primary-use" class="form-control">
+                                <option value="Variable">Variable</option>
+                                <option value="Biological buffer">Biological buffer</option>
+                                <option value="Chromatography resin">Chromatography resin</option>
+                                <option value="Gel electrophoresis/culture medium">Gel electrophoresis/culture medium</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="hazard-class" class="form-label">Hazard Classification</label>
+                        <select id="hazard-class" class="form-control">
+                            <option value="Low toxicity, generally safe, mild eye/skin irritant">Low toxicity, generally safe, mild eye/skin irritant</option>
+                            <option value="Moderate toxicity, harmful if ingested, eye/skin irritant">Moderate toxicity, harmful if ingested, eye/skin irritant</option>
+                            <option value="HIGH TOXICITY - Carcinogen, avoid skin contact">HIGH TOXICITY - Carcinogen, avoid skin contact</option>
+                            <option value="EXTREMELY TOXIC - Fatal if ingested, acute poison">EXTREMELY TOXIC - Fatal if ingested, acute poison</option>
+                            <option value="Corrosive, causes burns">Corrosive, causes burns</option>
+                            <option value="Refer to SDS">Refer to SDS</option>
+                            <option value="custom">Custom...</option>
+                        </select>
+                        <input type="text" id="hazard-class-custom" class="form-control hidden" placeholder="Enter custom hazard classification">
+                    </div>
+                    
+                    <!-- Buffer Information Section -->
+                    <div id="buffer-section" class="buffer-section hidden">
+                        <h3>Buffer Information</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="buffer-range" class="form-label">pH Range</label>
+                                <input type="text" id="buffer-range" class="form-control" placeholder="e.g., 7.0 - 9.0">
+                            </div>
+                            <div class="form-group">
+                                <label for="starting-ph" class="form-label">Starting pH</label>
+                                <input type="text" id="starting-ph" class="form-control" placeholder="e.g., ~10.5 (0.1 M solution)">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="ph-adjustment" class="form-label">pH Adjustment Method</label>
+                            <textarea id="ph-adjustment" class="form-control" rows="2" placeholder="e.g., Adjust with HCl (lower pH) or NaOH (raise pH)"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn--outline" id="modal-cancel">Cancel</button>
+                <button type="submit" form="chemical-form" class="btn btn--primary" id="modal-save">Save Chemical</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal hidden" id="delete-modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2>Confirm Deletion</h2>
+                <button class="modal-close" id="delete-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="delete-chemical-name"></strong>?</p>
+                <p class="text-warning">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn--outline" id="delete-cancel">Cancel</button>
+                <button type="button" class="btn btn--error" id="delete-confirm">Delete Chemical</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
