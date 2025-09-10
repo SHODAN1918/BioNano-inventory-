@@ -310,6 +310,7 @@ function getSortValue(chemical, sortBy) {
     }
 }
 
+
 // Toast notifications
 function showToast(message, type = 'info') {
     const toast = document.createElement('div');
@@ -452,12 +453,56 @@ function updateChemicalStock(id) {
     }
 }
 
-// Filter chemicals
 function filterChemicals() {
     const searchTerm = searchInput.value.toLowerCase();
     const shelfFilterValue = shelfFilter.value;
     const typeFilterValue = typeFilter.value;
     const stockFilterValue = stockFilter.value;
+
+    filteredData = chemicalData.filter(chemical => {
+        const matchesSearch = chemical.name.toLowerCase().includes(searchTerm) ||
+                            chemical.casNumber.toLowerCase().includes(searchTerm) ||
+                            chemical.molecularWeight.toLowerCase().includes(searchTerm) ||
+                            chemical.hazardClass.toLowerCase().includes(searchTerm);
+        
+        const matchesShelf = !shelfFilterValue || chemical.shelf === shelfFilterValue;
+        
+        // FIXED: Type filter logic
+        let matchesType = true;
+        if (typeFilterValue) {
+            switch (typeFilterValue) {
+                case 'buffer':
+                    matchesType = isBuffer(chemical);
+                    break;
+                case 'dangerous':
+                    matchesType = isDangerous(chemical);
+                    break;
+                case 'chromatography':
+                    matchesType = chemical.primaryUse === 'Chromatography resin';
+                    break;
+                case 'gel':
+                    matchesType = chemical.primaryUse === 'Gel electrophoresis/culture medium';
+                    break;
+                case 'variable':
+                    matchesType = chemical.primaryUse === 'Variable';
+                    break;
+                default:
+                    matchesType = true;
+            }
+        }
+        
+        const matchesStock = !stockFilterValue ||
+                           (stockFilterValue === 'in' && chemical.stock === '✅') ||
+                           (stockFilterValue === 'out' && chemical.stock !== '✅');
+
+        return matchesSearch && matchesShelf && matchesType && matchesStock;
+    });
+
+    sortChemicals();
+    displayChemicals();
+    updateStatistics();
+}
+
 
     filteredData = chemicalData.filter(chemical => {
         const matchesSearch = chemical.name.toLowerCase().includes(searchTerm) ||
