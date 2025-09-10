@@ -205,6 +205,7 @@ const noResultsContainer = document.getElementById('no-results');
 const searchInput = document.getElementById('search-input');
 const shelfFilter = document.getElementById('shelf-filter');
 const typeFilter = document.getElementById('type-filter');
+const stockFilter = document.getElementById('stock-filter');
 const sortSelect = document.getElementById('sort-select');
 const clearFiltersBtn = document.getElementById('clear-filters');
 const exportBtn = document.getElementById('export-btn');
@@ -451,51 +452,12 @@ function updateChemicalStock(id) {
     }
 }
 
-// Filter chemicals - FIXED VERSION (no stock filter)
+// Filter chemicals
 function filterChemicals() {
     const searchTerm = searchInput.value.toLowerCase();
     const shelfFilterValue = shelfFilter.value;
     const typeFilterValue = typeFilter.value;
-
-    filteredData = chemicalData.filter(chemical => {
-        const matchesSearch = chemical.name.toLowerCase().includes(searchTerm) ||
-                            chemical.casNumber.toLowerCase().includes(searchTerm) ||
-                            chemical.molecularWeight.toLowerCase().includes(searchTerm) ||
-                            chemical.hazardClass.toLowerCase().includes(searchTerm);
-        
-        const matchesShelf = !shelfFilterValue || chemical.shelf === shelfFilterValue;
-        
-        // Type filter logic
-        let matchesType = true;
-        if (typeFilterValue) {
-            switch (typeFilterValue) {
-                case 'buffer':
-                    matchesType = isBuffer(chemical);
-                    break;
-                case 'chromatography':
-                    matchesType = chemical.primaryUse === 'Chromatography resin';
-                    break;
-                case 'gel':
-                    matchesType = chemical.primaryUse === 'Gel electrophoresis/culture medium';
-                    break;
-                case 'variable':
-                    matchesType = chemical.primaryUse === 'Variable';
-                    break;
-                default:
-                    matchesType = true;
-            }
-        }
-        
-        // REMOVED: Stock filter logic
-        
-        return matchesSearch && matchesShelf && matchesType;
-    });
-
-    sortChemicals();
-    displayChemicals();
-    updateStatistics();
-}
-
+    const stockFilterValue = stockFilter.value;
 
     filteredData = chemicalData.filter(chemical => {
         const matchesSearch = chemical.name.toLowerCase().includes(searchTerm) ||
@@ -585,6 +547,7 @@ function clearFilters() {
     searchInput.value = '';
     shelfFilter.value = '';
     typeFilter.value = '';
+    stockFilter.value = '';
     sortSelect.value = 'name';
 
     filteredData = [...chemicalData];
@@ -730,6 +693,7 @@ function deleteChemical(id) {
 searchInput.addEventListener('input', filterChemicals);
 shelfFilter.addEventListener('change', filterChemicals);
 typeFilter.addEventListener('change', filterChemicals);
+stockFilter.addEventListener('change', filterChemicals);
 sortSelect.addEventListener('change', () => {
     sortChemicals();
     displayChemicals();

@@ -23,8 +23,10 @@
                         <span class="stat-label">Total Chemicals:</span>
                         <span class="stat-value" id="total-count">147</span>
                     </div>
-
-           
+                    <div class="stat">
+                        <span class="stat-label">In Stock:</span>
+                        <span class="stat-value" id="in-stock-count">133</span>
+                    </div>
                     <div class="stat">
                         <span class="stat-label">Showing:</span>
                         <span class="stat-value" id="showing-count">147</span>
@@ -74,19 +76,27 @@
                     </div>
 
                     <!-- Reagent Type Filter -->
-<div class="filter-section">
-    <label for="type-filter" class="form-label">Reagent Type</label>
-    <select id="type-filter" class="form-control">
-        <option value="">All Types</option>
-        <option value="buffer">Biological Buffers</option>
-        <option value="chromatography">Chromatography Resins</option>
-        <option value="gel">Gel/Culture Media</option>
-        <option value="variable">General Use</option>
-    </select>
-</div> 
+                    <div class="filter-section">
+                        <label for="type-filter" class="form-label">Reagent Type</label>
+                        <select id="type-filter" class="form-control">
+                            <option value="all">All Types</option>
+                            <option value="Biological buffer">Biological Buffer</option>
+                            <option value="Chromatography resin">Chromatography Resin</option>
+                            <option value="Gel electrophoresis/culture medium">Gel/Culture Medium</option>
+                            <option value="Variable">Variable/Other</option>
+                        </select>
+                    </div>
 
- 
-                    
+                    <!-- Stock Status Filter -->
+                    <div class="filter-section">
+                        <label for="stock-filter" class="form-label">Stock Status</label>
+                        <select id="stock-filter" class="form-control">
+                            <option value="all">All</option>
+                            <option value="in-stock">In Stock (✅)</option>
+                            <option value="out-of-stock">Out of Stock</option>
+                        </select>
+                    </div>
+
                     <!-- Sort Options -->
                     <div class="filter-section">
                         <label for="sort-select" class="form-label">Sort By</label>
@@ -94,6 +104,7 @@
                             <option value="name">Name (A-Z)</option>
                             <option value="shelf">Shelf Location</option>
                             <option value="molecular-weight">Molecular Weight</option>
+                            <option value="hazard">Hazard Level</option>
                         </select>
                     </div>
 
