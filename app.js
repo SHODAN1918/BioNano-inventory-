@@ -290,10 +290,8 @@ function isBuffer(chemical) {
 
 function getSortValue(chemical, sortBy) {
     switch (sortBy) {
-        case 'name': 
-            return chemical.name.toLowerCase();
-        case 'shelf': 
-            return chemical.shelf.toLowerCase();
+        case 'name': return chemical.name.toLowerCase();
+        case 'shelf': return chemical.shelf.toLowerCase();
         case 'molecular-weight':
             const mw = parseFloat(chemical.molecularWeight);
             return isNaN(mw) ? 99999 : mw;
@@ -305,11 +303,9 @@ function getSortValue(chemical, sortBy) {
                 'refer-sds': 0
             };
             return hazardLevels[getHazardLevel(chemical.hazardClass)] || 0;
-        default: 
-            return chemical.name.toLowerCase();
+        default: return chemical.name.toLowerCase();
     }
 }
-
 
 // Toast notifications
 function showToast(message, type = 'info') {
@@ -453,6 +449,7 @@ function updateChemicalStock(id) {
     }
 }
 
+// Filter chemicals
 function filterChemicals() {
     const searchTerm = searchInput.value.toLowerCase();
     const shelfFilterValue = shelfFilter.value;
@@ -461,36 +458,15 @@ function filterChemicals() {
 
     filteredData = chemicalData.filter(chemical => {
         const matchesSearch = chemical.name.toLowerCase().includes(searchTerm) ||
-                            chemical.casNumber.toLowerCase().includes(searchTerm) ||
-                            chemical.molecularWeight.toLowerCase().includes(searchTerm) ||
-                            chemical.hazardClass.toLowerCase().includes(searchTerm);
-        
+                            chemical.casNumber.includes(searchTerm) ||
+                            chemical.molecularWeight.includes(searchTerm);
+
         const matchesShelf = !shelfFilterValue || chemical.shelf === shelfFilterValue;
-        
-        // FIXED: Type filter logic
-        let matchesType = true;
-        if (typeFilterValue) {
-            switch (typeFilterValue) {
-                case 'buffer':
-                    matchesType = isBuffer(chemical);
-                    break;
-                case 'dangerous':
-                    matchesType = isDangerous(chemical);
-                    break;
-                case 'chromatography':
-                    matchesType = chemical.primaryUse === 'Chromatography resin';
-                    break;
-                case 'gel':
-                    matchesType = chemical.primaryUse === 'Gel electrophoresis/culture medium';
-                    break;
-                case 'variable':
-                    matchesType = chemical.primaryUse === 'Variable';
-                    break;
-                default:
-                    matchesType = true;
-            }
-        }
-        
+
+        const matchesType = !typeFilterValue || 
+                          (typeFilterValue === 'buffer' && isBuffer(chemical)) ||
+                          (typeFilterValue === 'dangerous' && isDangerous(chemical));
+
         const matchesStock = !stockFilterValue ||
                            (stockFilterValue === 'in' && chemical.stock === '✅') ||
                            (stockFilterValue === 'out' && chemical.stock !== '✅');
@@ -502,52 +478,6 @@ function filterChemicals() {
     displayChemicals();
     updateStatistics();
 }
-
-
-    filteredData = chemicalData.filter(chemical => {
-        const matchesSearch = chemical.name.toLowerCase().includes(searchTerm) ||
-                            chemical.casNumber.toLowerCase().includes(searchTerm) ||
-                            chemical.molecularWeight.toLowerCase().includes(searchTerm) ||
-                            chemical.hazardClass.toLowerCase().includes(searchTerm);
-        
-        const matchesShelf = !shelfFilterValue || chemical.shelf === shelfFilterValue;
-        
-        // FIXED: Type filter logic
-        let matchesType = true;
-        if (typeFilterValue) {
-            switch (typeFilterValue) {
-                case 'buffer':
-                    matchesType = isBuffer(chemical);
-                    break;
-                case 'dangerous':
-                    matchesType = isDangerous(chemical);
-                    break;
-                case 'chromatography':
-                    matchesType = chemical.primaryUse === 'Chromatography resin';
-                    break;
-                case 'gel':
-                    matchesType = chemical.primaryUse === 'Gel electrophoresis/culture medium';
-                    break;
-                case 'variable':
-                    matchesType = chemical.primaryUse === 'Variable';
-                    break;
-                default:
-                    matchesType = true;
-            }
-        }
-        
-        const matchesStock = !stockFilterValue ||
-                           (stockFilterValue === 'in' && chemical.stock === '✅') ||
-                           (stockFilterValue === 'out' && chemical.stock !== '✅');
-
-        return matchesSearch && matchesShelf && matchesType && matchesStock;
-    });
-
-    sortChemicals();
-    displayChemicals();
-    updateStatistics();
-}
-
 
 // Sort chemicals
 function sortChemicals() {
